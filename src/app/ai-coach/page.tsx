@@ -9,22 +9,40 @@ export default function AICoachPage() {
   ]);
   const [input, setInput] = useState("");
 
-  const handleSend = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isLoading) return;
     
     // Add user message
     const userMsg = { role: "user", content: input };
-    setMessages(prev => [...prev, userMsg]);
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
     setInput("");
+    setIsLoading(true);
 
-    // Mock AI response
-    setTimeout(() => {
-      setMessages(prev => [...prev, { 
-        role: "ai", 
-        content: "I'm currently running in local UI mode! Once the backend is connected to Gemini AI, I'll be able to give you personalized, data-driven advice based on your logs."
-      }]);
-    }, 1000);
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          message: userMsg.content,
+          history: messages.map(m => ({ role: m.role, text: m.content }))
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to get response");
+      
+      const data = await response.json();
+      
+      setMessages(prev => [...prev, { role: "ai", content: data.text }]);
+    } catch (error) {
+      console.error(error);
+      setMessages(prev => [...prev, { role: "ai", content: "Sorry, I'm having trouble connecting right now." }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
