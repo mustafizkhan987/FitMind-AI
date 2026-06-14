@@ -2,7 +2,7 @@ import { Bell, Search, Menu } from "lucide-react";
 
 export function Header() {
   return (
-    <header className="h-16 border-b border-zinc-800 bg-zinc-950/50 backdrop-blur-md sticky top-0 z-30 px-6 flex items-center justify-between">
+    <header className="h-16 border-b border-zinc-800 bg-zinc-950/50 backdrop-blur-sm sticky top-0 z-30 px-6 flex items-center justify-between">
       <div className="flex items-center gap-4">
         <button className="md:hidden text-zinc-400 hover:text-zinc-100">
           <Menu className="w-6 h-6" />

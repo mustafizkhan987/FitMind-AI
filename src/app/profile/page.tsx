@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { User, Settings, Award, Shield, LogOut } from "lucide-react";

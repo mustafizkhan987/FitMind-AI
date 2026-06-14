@@ -20,7 +20,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-72 border-r border-zinc-800/50 bg-zinc-950/80 backdrop-blur-2xl flex-shrink-0 hidden md:flex flex-col relative z-20">
+    <aside className="w-72 border-r border-zinc-800/50 bg-zinc-950/80 backdrop-blur-sm flex-shrink-0 hidden md:flex flex-col relative z-20">
       <div className="h-20 flex items-center px-8 border-b border-zinc-800/50">
         <div className="flex items-center gap-3 text-2xl font-extrabold text-white tracking-tight">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">

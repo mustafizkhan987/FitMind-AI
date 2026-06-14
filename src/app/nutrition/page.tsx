@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Utensils, Plus, Target, PieChart } from "lucide-react";

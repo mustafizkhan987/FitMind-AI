@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI, Type } from "@google/genai";
 
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    const data = JSON.parse(response.text() || "{}");
+    const data = JSON.parse(response.text || "{}");
     return NextResponse.json(data);
 
   } catch (error: any) {

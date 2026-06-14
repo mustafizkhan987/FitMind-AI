@@ -1,14 +1,14 @@
 "use client";
 
 import { Droplets, Plus, Minus } from "lucide-react";
-import { useState } from "react";
+import { useStore } from "@/store/useStore";
 
 export default function HydrationPage() {
-  const [waterAmount, setWaterAmount] = useState(1.2);
-  const goal = 2.5;
-
-  const addWater = () => setWaterAmount(prev => Math.min(prev + 0.25, 5));
-  const removeWater = () => setWaterAmount(prev => Math.max(prev - 0.25, 0));
+  const { waterDrank, waterGoal, addWater, removeWater } = useStore();
+  
+  // Convert glasses to Liters (assuming 1 glass = 0.25L)
+  const waterAmount = waterDrank * 0.25;
+  const goalLiters = waterGoal * 0.25;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-8 flex flex-col items-center mt-12">
@@ -19,8 +19,8 @@ export default function HydrationPage() {
 
       <div className="bg-zinc-900 border border-zinc-800 p-12 rounded-full aspect-square w-80 flex flex-col items-center justify-center relative overflow-hidden shadow-2xl shadow-blue-500/10">
         <div 
-          className="absolute bottom-0 left-0 right-0 bg-blue-500/20 transition-all duration-1000 ease-in-out -z-10"
-          style={{ height: `${(waterAmount / goal) * 100}%` }}
+          className="absolute bottom-0 left-0 right-0 bg-blue-500/20 transition-all duration-300 ease-in-out -z-10"
+          style={{ height: `${Math.min((waterAmount / goalLiters) * 100, 100)}%` }}
         />
         
         <Droplets className="w-12 h-12 text-blue-400 mb-4" />
@@ -28,7 +28,7 @@ export default function HydrationPage() {
           <h2 className="text-5xl font-bold text-white">{waterAmount.toFixed(2)}</h2>
           <span className="text-xl text-zinc-500">L</span>
         </div>
-        <p className="text-sm font-medium text-zinc-400">Daily Goal: {goal}L</p>
+        <p className="text-sm font-medium text-zinc-400">Daily Goal: {goalLiters}L</p>
       </div>
 
       <div className="flex items-center gap-6 mt-12">

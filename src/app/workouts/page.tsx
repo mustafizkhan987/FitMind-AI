@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { Activity, Plus, Dumbbell, Timer, Flame, Sparkles, Loader2 } from "lucide-react";
+import { Activity, Plus, Dumbbell, Timer, Flame, Sparkles, Loader2, Check } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useStore } from "@/store/useStore";
 
 export default function WorkoutsPage() {
   const [equipment, setEquipment] = useState("Dumbbells and bench");
@@ -10,10 +12,19 @@ export default function WorkoutsPage() {
   const [intensity, setIntensity] = useState("High");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedWorkout, setGeneratedWorkout] = useState<any>(null);
+  const [saved, setSaved] = useState(false);
+
+  const { workouts, addWorkout } = useStore();
+
+  // Quick Stats calculations
+  const totalWorkouts = workouts.length;
+  const totalDuration = workouts.reduce((sum, w) => sum + w.duration, 0);
+  const totalCalories = workouts.reduce((sum, w) => sum + w.calories, 0);
 
   const generateWorkout = async () => {
     setIsGenerating(true);
     setGeneratedWorkout(null);
+    setSaved(false);
     try {
       const res = await fetch("/api/generate-workout", {
         method: "POST",
@@ -48,26 +59,26 @@ export default function WorkoutsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Quick Stats */}
-        <div className="bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/60 rounded-3xl p-6 flex flex-col items-center justify-center">
+        <div className="bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/60 rounded-3xl p-6 flex flex-col items-center justify-center">
           <Dumbbell className="w-8 h-8 text-emerald-400 mb-2" />
-          <h3 className="text-3xl font-bold text-white">12</h3>
-          <p className="text-sm text-zinc-400">Workouts this week</p>
+          <h3 className="text-3xl font-bold text-white">{totalWorkouts}</h3>
+          <p className="text-sm text-zinc-400">Total Workouts</p>
         </div>
-        <div className="bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/60 rounded-3xl p-6 flex flex-col items-center justify-center">
+        <div className="bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/60 rounded-3xl p-6 flex flex-col items-center justify-center">
           <Timer className="w-8 h-8 text-blue-400 mb-2" />
-          <h3 className="text-3xl font-bold text-white">4.5h</h3>
+          <h3 className="text-3xl font-bold text-white">{Math.round(totalDuration / 60)}h {totalDuration % 60}m</h3>
           <p className="text-sm text-zinc-400">Total time</p>
         </div>
-        <div className="bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/60 rounded-3xl p-6 flex flex-col items-center justify-center">
+        <div className="bg-zinc-900/40 backdrop-blur-sm border border-zinc-800/60 rounded-3xl p-6 flex flex-col items-center justify-center">
           <Flame className="w-8 h-8 text-orange-400 mb-2" />
-          <h3 className="text-3xl font-bold text-white">3,200</h3>
+          <h3 className="text-3xl font-bold text-white">{totalCalories}</h3>
           <p className="text-sm text-zinc-400">Calories burned</p>
         </div>
       </div>
 
       {/* Smart Workout Generator */}
       <div className="bg-gradient-to-br from-zinc-900 to-zinc-950 border border-emerald-500/20 rounded-3xl overflow-hidden relative shadow-2xl">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[30px] opacity-30 rounded-full pointer-events-none" />
         
         <div className="px-6 py-5 border-b border-zinc-800/50 flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-emerald-400" />
@@ -112,7 +123,7 @@ export default function WorkoutsPage() {
                   <Flame className="w-4 h-4" /> ~{generatedWorkout.estimatedCalories} kcal
                 </span>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-4 mb-6">
                 {generatedWorkout.exercises?.map((ex: any, idx: number) => (
                   <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-zinc-900 rounded-xl border border-zinc-800/50 hover:border-zinc-700 transition-colors">
                     <div>
@@ -126,6 +137,22 @@ export default function WorkoutsPage() {
                   </div>
                 ))}
               </div>
+
+              <button
+                onClick={() => {
+                  addWorkout({
+                    type: generatedWorkout.title,
+                    duration: parseInt(time) || 30,
+                    calories: generatedWorkout.estimatedCalories || 300,
+                  });
+                  setSaved(true);
+                }}
+                disabled={saved}
+                className="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl py-3 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:hover:bg-zinc-800"
+              >
+                {saved ? <Check className="w-5 h-5 text-emerald-400" /> : <Plus className="w-5 h-5" />}
+                {saved ? "Saved to Log!" : "Save to My Log"}
+              </button>
             </motion.div>
           )}
         </div>
